@@ -391,7 +391,7 @@ instructions into the orchestrator's context; they never block a tool call. Sile
 |---|---|---|
 | `SessionStart` (`startup`) | `scripts/sync_stable.py` | Refreshes the stable copy of the scripts after a plugin update (below). |
 | `SessionStart` (`compact\|resume\|clear`) | `checkpoint.py --hook` | Re-injects the plan checkpoint and a limits line. |
-| `PostToolUse` (`Agent`) | `limits.py --hook PostToolUse`<br>`costs.py --hook PostToolUse` | After each agent launch or finish: a limits directive if the state degraded or changed; a budget alert at 80 % / 100 %. |
+| `PostToolUse` (`Agent|SendMessage`) | `limits.py --hook PostToolUse`<br>`costs.py --hook PostToolUse` | After each agent launch or finish: a limits directive if the state degraded or changed; a budget alert at 80 % / 100 %. |
 | `UserPromptSubmit` | `limits.py --hook UserPromptSubmit --cache-sec 120` | The same limits directive, once per prompt. |
 
 **Limits hook.** It keeps the last state (mode, per-model statuses, context status) in

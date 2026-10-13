@@ -3,7 +3,7 @@
 <br><br>
 <a href="#english"><img src="assets/btn-en.svg" height="48" alt="English"></a>&nbsp;&nbsp;<a href="#russian"><img src="assets/btn-ru.svg" height="48" alt="Русский"></a>
 <br><br>
-<a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-2.0.0-6E56CF?style=flat-square" alt="version 2.0.0"></a>
+<a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-2.0.1-6E56CF?style=flat-square" alt="version 2.0.1"></a>
 <a href="https://code.claude.com/docs/en/setup"><img src="https://img.shields.io/badge/Claude_Code-%E2%89%A5_2.1.292-D97757?style=flat-square" alt="Claude Code 2.1.292 or newer"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-3FB950?style=flat-square" alt="license MIT"></a>
 <img src="https://img.shields.io/badge/roles-27-0EA5E9?style=flat-square" alt="27 roles">

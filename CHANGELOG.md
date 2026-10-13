@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1 — 2026-10-13
+- Hooks: the limits and budget checks now also run after `SendMessage` (resuming an agent restarts paid work,
+  so it must be gated like a launch), and the budget check also runs on every prompt. Found in practice: a plan
+  whose agents were resumed after a limit reset ran past its budget without a warning.
+- `install.sh --hooks` updates the matcher of existing Orchestrator hook entries instead of skipping them.
+- `checkpoint.py --status` ignores `[ ]`/`[~]`/`[x]` inside HTML comments (the plan template has one).
+
 ## 2.0.0 — 2026-10-13 — "Claude Orchestrator"
 
 **Breaking: new names.** The plugin is now `orchestrator` in the marketplace `claude-orchestrator`

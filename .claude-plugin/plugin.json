@@ -2,7 +2,7 @@
   "name": "orchestrator",
   "displayName": "Claude Orchestrator",
   "description": "Claude Orchestrator: a multi-agent team lead for Claude Code. Plans work, routes 27 role subagents to the right model and effort, verifies results, tracks token costs per role, and actively manages session/weekly/per-model limits (Fable→Opus fallback, self-calibrating) and context (checkpoints, /compact recovery).",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": { "name": "newzealandgrom", "url": "https://github.com/newzealandgrom" },
   "homepage": "https://github.com/newzealandgrom/claude-orchestrator",
   "repository": "https://github.com/newzealandgrom/claude-orchestrator",

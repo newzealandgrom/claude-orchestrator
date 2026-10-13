@@ -89,18 +89,21 @@ def install(path: str, stable: str, want_sl: bool, want_hooks: bool) -> None:
 
         def add(event, matcher, script, args):
             groups = hooks.setdefault(event, [])
-            if any(OURS in h.get("command", "") and script in h.get("command", "")
-                   for g in groups for h in g.get("hooks", [])):
-                return
+            for g in groups:  # already installed: only bring the matcher up to date
+                if any(OURS in h.get("command", "") and script in h.get("command", "") for h in g.get("hooks", [])):
+                    if matcher and g.get("matcher") != matcher:
+                        g["matcher"] = matcher
+                    return
             group = {"hooks": [{"type": "command", "command": f"python3 {q(os.path.join(stable, script))} {args}", "timeout": 30}]}
             if matcher:
                 group["matcher"] = matcher
             groups.append(group)
 
         add("SessionStart", "compact|resume|clear", "checkpoint.py", "--hook")
-        add("PostToolUse", "Agent", "limits.py", "--hook PostToolUse")
-        add("PostToolUse", "Agent", "costs.py", "--hook PostToolUse")
+        add("PostToolUse", "Agent|SendMessage", "limits.py", "--hook PostToolUse")
+        add("PostToolUse", "Agent|SendMessage", "costs.py", "--hook PostToolUse")
         add("UserPromptSubmit", None, "limits.py", "--hook UserPromptSubmit --cache-sec 120")
+        add("UserPromptSubmit", None, "costs.py", "--hook UserPromptSubmit")
     save(path, data)
     print(f"patched {path} (statusline={want_sl}, hooks={want_hooks}); backup kept next to it")
 

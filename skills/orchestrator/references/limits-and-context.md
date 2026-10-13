@@ -83,8 +83,8 @@ and once at 100 % (no new agents; ask the user to extend the budget).
 | Event | Command | Effect |
 |---|---|---|
 | `SessionStart` (`compact|resume|clear`) | `checkpoint.py --hook` | Re-injects the active plan checkpoint + limits line. |
-| `PostToolUse` (`Agent`) | `limits.py --hook PostToolUse` | After each agent launch/finish: directive via `additionalContext` if the state degraded/changed. |
-| `PostToolUse` (`Agent`) | `costs.py --hook PostToolUse` | Budget alert once the active plan crosses 80 % / 100 % of its `Budget:`. |
+| `PostToolUse` (`Agent|SendMessage`) | `limits.py --hook PostToolUse` | After each agent launch/finish: directive via `additionalContext` if the state degraded/changed. |
+| `PostToolUse` (`Agent|SendMessage`) | `costs.py --hook PostToolUse` | Budget alert once the active plan crosses 80 % / 100 % of its `Budget:`. |
 | `UserPromptSubmit` | `limits.py --hook UserPromptSubmit --cache-sec 120` | Same, once per user prompt. |
 
 The status line cannot be shipped by a plugin: enable it once with `install.sh --statusline` or by adding

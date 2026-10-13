@@ -24,7 +24,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Agent",
+        "matcher": "Agent|SendMessage",
         "hooks": [
           {
             "type": "command",
@@ -45,6 +45,11 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/limits.py\" --hook UserPromptSubmit --cache-sec 120",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/costs.py\" --hook UserPromptSubmit",
             "timeout": 30
           }
         ]

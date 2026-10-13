@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" role="img" aria-labelledby="lr-title lr-desc">
+  <title id="lr-title">The /orchestrator:limits report</title>
+  <desc id="lr-desc">A terminal window showing the limits report: mode ECONOMY, 5-hour session at 63 percent (29.0M of 46.0M units, resets 14:50), week at 22 percent, per-model status (fable economy at 71 percent of its weekly cap; haiku, opus and sonnet ok), context 41 percent, calibration lines and the recommended actions. Below it a legend of the four modes: normal under 60 percent, economy from 60, critical from 80, exhausted from 95.</desc>
+  <defs>
+    <linearGradient id="lr-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#161b2e"/>
+    </linearGradient>
+    <linearGradient id="lr-border" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity=".45"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
+    .t    { font-size: 15px; fill: #e6edf3; white-space: pre; }
+    .k    { fill: #8b949e; }
+    .v    { fill: #e6edf3; }
+    .n    { fill: #22d3ee; }
+    .amb  { fill: #fbbf24; }
+    .grn  { fill: #4ade80; }
+    .ok   { fill: #4ade80; font-weight: 700; }
+    .eco  { fill: #fbbf24; font-weight: 700; }
+    .off  { fill: #f87171; font-weight: 700; }
+    .dim  { fill: #7d8590; }
+    .acc  { fill: #a78bfa; font-weight: 700; }
+    .key  { font-size: 13px; fill: #8b949e; }
+    .chip { font-size: 14px; font-weight: 600; }
+    .seg  { font-size: 14px; font-weight: 700; fill: #0b0f19; text-anchor: middle; }
+    .thr  { font-weight: 500; }
+    .cap  { font-size: 13px; fill: #8b949e; text-anchor: middle; }
+    @media (prefers-reduced-motion: no-preference) {
+      .glow { animation: lr-glow 3s ease-in-out infinite; }
+      @keyframes lr-glow { 0%, 100% { stroke-opacity: 0; } 50% { stroke-opacity: .55; } }
+    }
+  </style>
+
+  <!-- card -->
+  <rect x="0.75" y="0.75" width="998.5" height="598.5" rx="18" fill="url(#lr-bg)" stroke="url(#lr-border)" stroke-width="1.5"/>
+
+  <!-- terminal window -->
+  <rect x="28" y="22" width="944" height="458" rx="12" fill="#0a0e16" stroke="#2a3142"/>
+  <path d="M28 62 V34 a12 12 0 0 1 12 -12 H960 a12 12 0 0 1 12 12 V62 Z" fill="#121826"/>
+  <path d="M28.5 62 H971.5" stroke="#2a3142"/>
+  <circle cx="52" cy="42" r="6" fill="#ff5f57" fill-opacity=".85"/>
+  <circle cx="72" cy="42" r="6" fill="#febc2e" fill-opacity=".85"/>
+  <circle cx="92" cy="42" r="6" fill="#28c840" fill-opacity=".85"/>
+  <text class="mono" x="500" y="47" font-size="14" fill="#8b949e" text-anchor="middle">/orchestrator:limits</text>
+
+  <!-- mode badge -->
+  <text class="mono t k" x="54" y="92" xml:space="preserve">mode:</text>
+  <rect class="glow" x="104" y="73.5" width="86" height="26" rx="8" fill="none" stroke="#f59e0b" stroke-width="2" stroke-opacity="0"/>
+  <rect x="107" y="75.5" width="80" height="22" rx="6" fill="#f59e0b"/>
+  <text class="mono" x="147" y="92" font-size="14.5" font-weight="700" fill="#1a1200" text-anchor="middle">ECONOMY</text>
+
+  <!-- report -->
+  <text class="mono t" x="54" y="116" xml:space="preserve"><tspan class="k">session 5h: </tspan><tspan class="v">29.0M / 46.0M units </tspan><tspan class="k">(</tspan><tspan class="amb">63%</tspan><tspan class="k">, cap: statusline)</tspan><tspan class="v"> · resets 14:50</tspan></text>
+  <text class="mono t" x="54" y="140" xml:space="preserve"><tspan class="k">week 7d:    </tspan><tspan class="v">54.9M / 249.7M units </tspan><tspan class="k">(</tspan><tspan class="grn">22%</tspan><tspan class="k">)</tspan></text>
+  <text class="mono t" x="54" y="164" xml:space="preserve"><tspan class="k">model </tspan><tspan class="v">fable   </tspan><tspan class="eco">economy</tspan><tspan class="dim">  week 21.3M / 30.0M (</tspan><tspan class="amb">71%</tspan><tspan class="dim">)</tspan></text>
+  <text class="mono t" x="54" y="188" xml:space="preserve"><tspan class="k">model </tspan><tspan class="v">haiku   </tspan><tspan class="ok">ok</tspan><tspan class="dim">       week 0.6M / ? (n/a)</tspan></text>
+  <text class="mono t" x="54" y="212" xml:space="preserve"><tspan class="k">model </tspan><tspan class="v">opus    </tspan><tspan class="ok">ok</tspan><tspan class="dim">       week 28.1M / ? (n/a)</tspan></text>
+  <text class="mono t" x="54" y="236" xml:space="preserve"><tspan class="k">model </tspan><tspan class="v">sonnet  </tspan><tspan class="ok">ok</tspan><tspan class="dim">       week 4.4M / ? (n/a)</tspan></text>
+  <text class="mono t" x="54" y="260" xml:space="preserve"><tspan class="k">context: </tspan><tspan class="v">412880 / 1000000 tokens </tspan><tspan class="k">(</tspan><tspan class="n">41%</tspan><tspan class="k">) -&gt; </tspan><tspan class="ok">ok</tspan><tspan class="dim">  [3f2a9c1e-….jsonl]</tspan></text>
+  <text class="mono t" x="54" y="284" xml:space="preserve"><tspan class="k">calibration 5h: </tspan><tspan class="v">1% ≈ 459704 units </tspan><tspan class="dim">(learned at 63%, 2026-05-04T12:31Z)</tspan></text>
+  <text class="mono t" x="54" y="308" xml:space="preserve"><tspan class="k">calibration 7d: </tspan><tspan class="v">1% ≈ 2496956 units </tspan><tspan class="dim">(learned at 22%, 2026-05-04T12:31Z)</tspan></text>
+  <text class="mono t" x="54" y="332" xml:space="preserve"><tspan class="k">source: </tspan><tspan class="n">statusline+transcripts</tspan></text>
+  <text class="mono t" x="54" y="356" xml:space="preserve"><tspan class="acc">actions:</tspan></text>
+  <text class="mono t" x="54" y="380" xml:space="preserve"><tspan class="k">  - </tspan><tspan class="eco">ECONOMY:</tspan><tspan class="v"> max 2 parallel heavy agents; no refute panels; prefer haiku for search/build,</tspan></text>
+  <text class="mono t" x="54" y="404" xml:space="preserve"><tspan class="v">    sonnet for analysis; reviews only for risky changes.</tspan></text>
+  <text class="mono t" x="54" y="428" xml:space="preserve"><tspan class="k">  - </tspan><tspan class="eco">FABLE ECONOMY:</tspan><tspan class="v"> use fable only as judge for critical/protocol decisions; other fable</tspan></text>
+  <text class="mono t" x="54" y="452" xml:space="preserve"><tspan class="v">    roles -&gt; opus, effort max.</tspan></text>
+
+  <!-- per-model status key -->
+  <path d="M510 153 Q518 153 518 161 L518 182 Q518 196 526 196 Q518 196 518 210 L518 231 Q518 240 510 240" fill="none" stroke="#3a4256" stroke-width="1.5" stroke-linecap="round"/>
+  <text class="sans key" x="540" y="192">model status</text>
+  <circle cx="545" cy="209" r="4.5" fill="#22c55e"/>
+  <text class="sans chip" x="555" y="214" fill="#4ade80">ok</text>
+  <circle cx="601" cy="209" r="4.5" fill="#f59e0b"/>
+  <text class="sans chip" x="611" y="214" fill="#fbbf24">economy</text>
+  <circle cx="689" cy="209" r="4.5" fill="#ef4444"/>
+  <text class="sans chip" x="699" y="214" fill="#f87171">off</text>
+
+  <!-- mode legend bar -->
+  <text class="sans" x="386.25" y="499" font-size="12" font-weight="700" fill="#fbbf24" text-anchor="middle">now</text>
+  <path d="M380 503 H392.5 L386.25 510 Z" fill="#fbbf24"/>
+  <rect x="48" y="514" width="221.5" height="34" rx="10" fill="#22c55e"/>
+  <rect x="275.5" y="514" width="221.5" height="34" rx="10" fill="#f59e0b"/>
+  <rect x="503" y="514" width="221.5" height="34" rx="10" fill="#f97316"/>
+  <rect x="730.5" y="514" width="221.5" height="34" rx="10" fill="#ef4444"/>
+  <text class="sans seg" x="158.75" y="536">normal<tspan class="thr" dx="7">&lt; 60 %</tspan></text>
+  <text class="sans seg" x="386.25" y="536">economy<tspan class="thr" dx="7">≥ 60 %</tspan></text>
+  <text class="sans seg" x="613.75" y="536">critical<tspan class="thr" dx="7">≥ 80 %</tspan></text>
+  <text class="sans seg" x="841.25" y="536">exhausted<tspan class="thr" dx="7">≥ 95 %</tspan></text>
+  <text class="sans cap" x="158.75" y="572">up to 4 heavy agents</text>
+  <text class="sans cap" x="386.25" y="572">max 2 heavy agents</text>
+  <text class="sans cap" x="613.75" y="572">no new heavy agents</text>
+  <text class="sans cap" x="841.25" y="572">launch nothing</text>
+</svg>

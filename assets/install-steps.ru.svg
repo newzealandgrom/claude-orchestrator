@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="516" viewBox="0 0 1200 516" role="img" aria-labelledby="is-title is-desc" xml:lang="ru">
+  <title id="is-title">Установка Claude Orchestrator в три шага</title>
+  <desc id="is-desc">Шаг 1: откройте терминал (macOS Terminal, любой терминал Linux или WSL Ubuntu в Windows), выполните cd ~/my-project и затем claude. Шаг 2: в строке ввода Claude Code введите /plugin install orchestrator --marketplace newzealandgrom/claude-orchestrator. Шаг 3: проверьте установку: /agents (27 ролей orchestrator:orch-*), /orchestrator:limits (отчёт о лимитах), /orchestrator:setup (строка статуса, по желанию).</desc>
+  <defs>
+    <linearGradient id="is-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#161b2e"/>
+    </linearGradient>
+    <linearGradient id="is-border" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity=".45"/>
+    </linearGradient>
+    <linearGradient id="is-term" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+    <linearGradient id="is-cc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="is-gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="is-arrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
+    .ttl  { font-size: 20px; font-weight: 700; fill: #ffffff; }
+    .num  { font-size: 22px; font-weight: 800; text-anchor: middle; }
+    .chip { font-size: 13.5px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+    .note { font-size: 13.5px; fill: #8b949e; }
+    .res  { font-size: 13.5px; fill: #c9d1d9; }
+    @media (prefers-reduced-motion: no-preference) {
+      .blink { animation: is-blink 1.1s steps(1, end) infinite; }
+      @keyframes is-blink { 0%, 55% { fill-opacity: 1; } 56%, 100% { fill-opacity: 0; } }
+    }
+  </style>
+
+  <!-- card -->
+  <rect x="0.75" y="0.75" width="1198.5" height="514.5" rx="20" fill="url(#is-bg)" stroke="url(#is-border)" stroke-width="1.5"/>
+
+  <!-- card 1 -->
+  <rect x="24" y="26" width="276" height="464" rx="16" fill="#121726" stroke="#2a3045"/>
+  <path d="M24 130 V42 a16 16 0 0 1 16 -16 H284 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-term)"/>
+  <path d="M24 130 V42 a16 16 0 0 1 16 -16 H284 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-gloss)"/>
+  <circle cx="62" cy="64" r="20" fill="#ffffff" fill-opacity=".96"/>
+  <text class="sans num" x="62" y="72" fill="#0f766e">1</text>
+  <rect x="184" y="50" width="100" height="28" rx="14" fill="#ffffff" fill-opacity=".17" stroke="#ffffff" stroke-opacity=".4"/>
+  <text class="sans chip" x="234" y="69">Терминал</text>
+  <text class="sans ttl" x="44" y="114">Откройте терминал</text>
+
+  <!-- card 2 -->
+  <rect x="336" y="26" width="510" height="464" rx="16" fill="#121726" stroke="#2a3045"/>
+  <path d="M336 130 V42 a16 16 0 0 1 16 -16 H830 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-cc)"/>
+  <path d="M336 130 V42 a16 16 0 0 1 16 -16 H830 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-gloss)"/>
+  <circle cx="374" cy="64" r="20" fill="#ffffff" fill-opacity=".96"/>
+  <text class="sans num" x="374" y="72" fill="#4c1d95">2</text>
+  <rect x="710" y="50" width="120" height="28" rx="14" fill="#ffffff" fill-opacity=".17" stroke="#ffffff" stroke-opacity=".4"/>
+  <text class="sans chip" x="770" y="69">Claude Code</text>
+  <text class="sans ttl" x="356" y="114">Введите в Claude Code</text>
+
+  <!-- card 3 -->
+  <rect x="882" y="26" width="294" height="464" rx="16" fill="#121726" stroke="#2a3045"/>
+  <path d="M882 130 V42 a16 16 0 0 1 16 -16 H1160 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-cc)"/>
+  <path d="M882 130 V42 a16 16 0 0 1 16 -16 H1160 a16 16 0 0 1 16 16 V130 Z" fill="url(#is-gloss)"/>
+  <circle cx="920" cy="64" r="20" fill="#ffffff" fill-opacity=".96"/>
+  <text class="sans num" x="920" y="72" fill="#4c1d95">3</text>
+  <rect x="1040" y="50" width="120" height="28" rx="14" fill="#ffffff" fill-opacity=".17" stroke="#ffffff" stroke-opacity=".4"/>
+  <text class="sans chip" x="1100" y="69">Claude Code</text>
+  <text class="sans ttl" x="902" y="114">Проверьте</text>
+
+  <!-- 1: terminal window ($ = shell prompt) -->
+  <rect x="40" y="152" width="244" height="262" rx="10" fill="#080c10" stroke="#1f4a50"/>
+  <path d="M40.5 186 V162 a9.5 9.5 0 0 1 9.5 -9.5 H274 a9.5 9.5 0 0 1 9.5 9.5 V186 Z" fill="#112a2e"/>
+  <path d="M40.5 186 H283.5" stroke="#1f4a50"/>
+  <circle cx="58" cy="169" r="5" fill="#ff5f57" fill-opacity=".8"/>
+  <circle cx="75" cy="169" r="5" fill="#febc2e" fill-opacity=".8"/>
+  <circle cx="92" cy="169" r="5" fill="#28c840" fill-opacity=".8"/>
+  <text class="mono" font-size="18" x="62" y="286.5" xml:space="preserve"><tspan fill="#7d8590">$ </tspan><tspan fill="#e6edf3">cd </tspan><tspan fill="#5eead4">~/my-project</tspan></text>
+  <text class="mono" font-size="18" x="62" y="326.5" xml:space="preserve"><tspan fill="#7d8590">$ </tspan><tspan fill="#ffffff" font-weight="700">claude</tspan><tspan class="blink" fill="#2dd4bf"> █</tspan></text>
+  <text class="sans note" x="42" y="444">macOS: Terminal · Linux: любой</text>
+  <text class="sans note" x="42" y="463">Windows: WSL Ubuntu</text>
+
+  <!-- 2: Claude Code window (> = Claude Code prompt) -->
+  <rect x="352" y="152" width="478" height="262" rx="10" fill="#0b0d18" stroke="#3a2f6b"/>
+  <path d="M352.5 186 V162 a9.5 9.5 0 0 1 9.5 -9.5 H820 a9.5 9.5 0 0 1 9.5 9.5 V186 Z" fill="#1a1633"/>
+  <path d="M352.5 186 H829.5" stroke="#3a2f6b"/>
+  <circle cx="370" cy="169" r="5" fill="#ff5f57" fill-opacity=".8"/>
+  <circle cx="387" cy="169" r="5" fill="#febc2e" fill-opacity=".8"/>
+  <circle cx="404" cy="169" r="5" fill="#28c840" fill-opacity=".8"/>
+  <rect x="368" y="251" width="446" height="98" rx="11" fill="none" stroke="#8b5cf6" stroke-opacity=".16" stroke-width="8"/>
+  <rect x="368" y="251" width="446" height="98" rx="11" fill="#0a0c15" stroke="#8b5cf6" stroke-width="1.6"/>
+  <text class="mono" font-size="19" font-weight="700" x="384" y="288" fill="#a78bfa">&gt;</text>
+  <text class="mono" font-size="15" x="404" y="288" xml:space="preserve"><tspan fill="#c4b5fd" font-weight="700">/plugin install</tspan><tspan fill="#ffffff"> orchestrator</tspan><tspan fill="#8b949e"> --marketplace</tspan></text>
+  <text class="mono" font-size="15" x="404" y="317" xml:space="preserve"><tspan fill="#22d3ee">newzealandgrom/claude-orchestrator</tspan><tspan class="blink" fill="#a78bfa"> █</tspan></text>
+  <text class="sans note" x="354" y="463">Нужен Claude Code ≥ 2.1.275</text>
+
+  <!-- 3: checks, typed in Claude Code (> prompt) -->
+  <rect x="898" y="152" width="262" height="262" rx="10" fill="#0b0d18" stroke="#3a2f6b"/>
+  <path d="M898.5 186 V162 a9.5 9.5 0 0 1 9.5 -9.5 H1150 a9.5 9.5 0 0 1 9.5 9.5 V186 Z" fill="#1a1633"/>
+  <path d="M898.5 186 H1159.5" stroke="#3a2f6b"/>
+  <circle cx="916" cy="169" r="5" fill="#ff5f57" fill-opacity=".8"/>
+  <circle cx="933" cy="169" r="5" fill="#febc2e" fill-opacity=".8"/>
+  <circle cx="950" cy="169" r="5" fill="#28c840" fill-opacity=".8"/>
+  <rect x="910" y="203" width="238" height="32" rx="9" fill="#0a0c15" stroke="#8b5cf6" stroke-opacity=".75" stroke-width="1.3"/>
+  <text class="mono" font-size="16" font-weight="700" x="923" y="224.5" fill="#a78bfa">&gt;</text>
+  <text class="mono" font-size="14.5" x="942" y="224" fill="#ffffff">/agents</text>
+  <text class="sans" font-size="15" x="912" y="256" fill="#22d3ee">→</text>
+  <text class="sans res" x="931" y="256">27 ролей orchestrator:orch-*</text>
+  <rect x="910" y="271" width="238" height="32" rx="9" fill="#0a0c15" stroke="#8b5cf6" stroke-opacity=".75" stroke-width="1.3"/>
+  <text class="mono" font-size="16" font-weight="700" x="923" y="292.5" fill="#a78bfa">&gt;</text>
+  <text class="mono" font-size="14.5" x="942" y="292" fill="#ffffff">/orchestrator:limits</text>
+  <text class="sans" font-size="15" x="912" y="324" fill="#22d3ee">→</text>
+  <text class="sans res" x="931" y="324">отчёт о лимитах</text>
+  <rect x="910" y="339" width="238" height="32" rx="9" fill="#0a0c15" stroke="#8b5cf6" stroke-opacity=".75" stroke-width="1.3"/>
+  <text class="mono" font-size="16" font-weight="700" x="923" y="360.5" fill="#a78bfa">&gt;</text>
+  <text class="mono" font-size="14.5" x="942" y="360" fill="#ffffff">/orchestrator:setup</text>
+  <text class="sans" font-size="15" x="912" y="392" fill="#22d3ee">→</text>
+  <text class="sans res" x="931" y="392">строка статуса (по желанию)</text>
+  <text class="sans note" x="900" y="444">Нет новых команд?</text>
+  <text class="sans note" x="900" y="463"><tspan class="mono" fill="#c9d1d9">/reload-plugins</tspan> или перезапуск</text>
+
+  <!-- arrow -->
+  <circle cx="318" cy="283" r="13" fill="url(#is-arrow)"/>
+  <path d="M312.5 283 H323.5 M319.5 278.2 L324 283 L319.5 287.8" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- arrow -->
+  <circle cx="864" cy="283" r="13" fill="url(#is-arrow)"/>
+  <path d="M858.5 283 H869.5 M865.5 278.2 L870 283 L865.5 287.8" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

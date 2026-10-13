@@ -2,7 +2,7 @@
 
 ## Where the numbers come from (best first)
 
-1. **Official status-line data** (`scripts/statusline.py` → `~/.claude/team-orchestrator/statusline.json`).
+1. **Official status-line data** (`scripts/statusline.py` → `~/.claude/claude-orchestrator/statusline.json`).
    Claude Code passes `rate_limits.five_hour` / `seven_day` (`used_percentage`, `resets_at`) to the status line
    for Pro/Max subscribers, and `context_window.used_percentage` to everyone. Used when younger than 10 min.
 2. **Local transcripts** (`~/.claude/projects/**/*.jsonl`, incl. `*/subagents/*.jsonl`): every response's
@@ -14,7 +14,12 @@
    limit hit = the cap. Before the first hit the cap is the largest past block (`cap_source: history-max`,
    low confidence → thresholds act one level lower: ≥ 80 % → `economy`, ≥ 95 % → `critical`; a real limit error
    always means `exhausted`).
-4. **Config** `~/.claude/team-orchestrator/limits.json` (see `examples/limits.example.json`) overrides caps,
+4. **Self-calibration** (`~/.claude/claude-orchestrator/calibration.json`). While official numbers are fresh,
+   `limits.py` learns how many usage units make 1 % of the 5-hour and the weekly limit (and the official window
+   boundaries). When the snapshot is older than 10 min it uses that scale (`cap_source: calibrated`) instead of
+   the history guess. It is an approximation between status-line refreshes (usage on other devices or
+   claude.ai is invisible locally); fresh official numbers always win.
+5. **Config** `~/.claude/claude-orchestrator/limits.json` (see `examples/limits.example.json`) overrides caps,
    weights, thresholds and the context window.
 
 Run: `python3 scripts/limits.py` (human), `--json` (machine), `--hook <Event>` (hooks; silent unless the state
@@ -64,12 +69,22 @@ An agent result or notification containing `rate_limit`, `429`, `You've hit your
 - Optional tuning by the user: `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` (lower auto-compact threshold),
   `CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
 
+## Costs and budgets
+
+`scripts/costs.py` turns the same transcripts into a cost report: per role (subagent type from
+`subagents/*.meta.json`), per agent, top consumers, ≈ % of the 5-hour limit and of the week (via the
+calibration). `--plan <plan>` checks the plan's `Budget:` line (`25%` of the 5-hour limit, `4M tokens` or
+`2.5M units`), counting every session of the project since the plan's `Started:`/`Date:`. The budget hook
+(`costs.py --hook PostToolUse`) speaks once at 80 % (prefer cheaper models, no optional reviews, tell the user)
+and once at 100 % (no new agents; ask the user to extend the budget).
+
 ## Hooks shipped with the plugin
 
 | Event | Command | Effect |
 |---|---|---|
 | `SessionStart` (`compact|resume|clear`) | `checkpoint.py --hook` | Re-injects the active plan checkpoint + limits line. |
 | `PostToolUse` (`Agent`) | `limits.py --hook PostToolUse` | After each agent launch/finish: directive via `additionalContext` if the state degraded/changed. |
+| `PostToolUse` (`Agent`) | `costs.py --hook PostToolUse` | Budget alert once the active plan crosses 80 % / 100 % of its `Budget:`. |
 | `UserPromptSubmit` | `limits.py --hook UserPromptSubmit --cache-sec 120` | Same, once per user prompt. |
 
 The status line cannot be shipped by a plugin: enable it once with `install.sh --statusline` or by adding

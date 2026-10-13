@@ -3,7 +3,7 @@
 # Results go to <project>/.claude/runs/<run-id>/{brief.md,result.json,stream.jsonl,stderr.log,done}.
 #
 #   spawn.sh <agent> <brief-file|-> [options]
-#     <agent>   orch-scout | team-orchestrator:orch-scout | any agent name known to `claude --agent`
+#     <agent>   orch-scout | orchestrator:orch-scout | any agent name known to `claude --agent`
 #   --mode headless|terminal|tmux|interactive   (default headless)
 #        headless     background process, output to files only
 #        terminal     new Terminal.app window (macOS) with live output

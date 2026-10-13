@@ -1,14 +1,15 @@
 {
-  "name": "team-orchestrator",
+  "name": "claude-orchestrator",
   "owner": { "name": "newzealandgrom", "url": "https://github.com/newzealandgrom" },
-  "metadata": { "description": "Team Orchestrator plugin for Claude Code" },
+  "metadata": { "description": "Claude Orchestrator — a limit- and context-aware multi-agent team for Claude Code", "version": "2.0.0" },
   "plugins": [
     {
-      "name": "team-orchestrator",
+      "name": "orchestrator",
       "source": "./",
-      "description": "Plan → delegate to role subagents → verify → report, with limit- and context-aware model routing.",
+      "description": "Plan → delegate to 27 role subagents → verify → report, with limit- and context-aware model routing, cost tracking and ready-made playbooks.",
+      "version": "2.0.0",
       "category": "productivity",
-      "tags": ["orchestration", "agents", "limits", "context"]
+      "tags": ["orchestration", "agents", "team", "limits", "context", "playbooks"]
     }
   ]
 }

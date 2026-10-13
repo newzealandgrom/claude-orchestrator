@@ -1,0 +1,47 @@
+[orchestrator] status — plan .claude/plans/2026-05-04-password-reset.md (in-progress)
+progress: 4 done · 2 in progress · 3 to do  ■■■■◧◧□□□ 44%
+
+# Plan: Password reset by e-mail
+
+**Date:** 2026-05-04 · **Status:** in-progress
+**Started:** 2026-05-04 16:50 · **Budget:** 25% of the 5-hour limit
+**Playbook:** feature
+**Request (verbatim):** "Add 'forgot password' by e-mail: the user enters their address, gets a link valid for 30 minutes and sets a new password on a new page. Backend API, DB migration, web client, e-mail template. Keep it under 25% of my 5-hour limit. Don't deploy anything without asking me."
+**Size:** L · **Token estimate:** ≈ 9M units (≈ 20% of the 5-hour limit) · **Actual:** —
+**Touches production / publishes:** yes (step 9: migration + deploy, only after the user's yes)
+**Limits at start:** `python3 <skill>/scripts/limits.py` → mode normal, fable ok, context 3%
+
+## Goal and scope
+A user who forgot the password can request a reset link by e-mail (valid 30 minutes, single use) and set a new password on a new page. At the end: the old password stops working, every existing session of that account is revoked, and the flow never reveals whether an address is registered.
+...
+## Checkpoint
+- Done: 1 recon (3 scouts + baseline) · 2 design review (S1–S6 folded into the briefs) · 3 backend core (dev-senior f6b3e1a924) · 4 verification (reviewers a0bfb4ae2d and 4a9d0c7e5b: ACCEPT after one rework round; build-verifier PASS)
+- In flight: a3de429a5d (orch-dev-senior) — endpoints and web pages, started 18:20 · b81f6c0e47 (orch-tech-writer) — API docs and e-mail copy, started 18:42
+- Next: step 7 (tests) when a3de429a5d reports; then step 8; step 9 only after the user's yes
+- Open decisions / waiting for the user: none. Nothing is deployed without a yes.
+- Key paths: `.claude/orchestrator/project-map.md` · `src/services/resetTokens.js` · `db/migrations/20260504_password_reset_tokens.sql`
+
+limits:
+mode: ECONOMY
+session 5h: 28961327 / 45970360 units (63%, cap: statusline), block 2026-05-04T09:50:00+00:00 -> 2026-05-04T14:50:00+00:00
+week 7d:    54933023 / 249695560 units (22%)
+model fable   economy  week 21304118 / 30005800 (71%)
+model haiku   ok       week 559344 / ? (n/a)
+model opus    ok       week 28131516 / ? (n/a)
+model sonnet  ok       week 4407242 / ? (n/a)
+context: 412880 / 1000000 tokens (41%) -> ok  [3f2a9c1e-….jsonl]
+...
+actions:
+  - ECONOMY: max 2 parallel heavy agents; no refute panels; prefer haiku for search/build, sonnet for analysis; reviews only for risky changes.
+  - FABLE ECONOMY: use fable only as judge for critical/protocol decisions; other fable roles -> opus, effort max.
+
+costs:
+Costs — session 3f2a9c1e · since 2026-05-04 09:52Z · 412 responses
+  total: 61.2M tokens · 8.47M units · ≈ 18.4% of the 5-hour limit · ≈ 3.4% of the week
+  ...
+
+  top agents:
+    orch-dev-senior        a3de429a5d    1.52M units  opus   API + web client for password reset
+    orch-reviewer          a0bfb4ae2d    0.81M units  opus   Review backend changes
+
+  budget (2026-05-04-password-reset.md, all sessions since 2026-05-04 16:50): 25% of the 5-hour limit → spent 18.4% = 74% → OK

@@ -1,0 +1,14 @@
+mode: ECONOMY
+session 5h: 28961327 / 45970360 units (63%, cap: statusline), block 2026-05-04T09:50:00+00:00 -> 2026-05-04T14:50:00+00:00
+week 7d:    54933023 / 249695560 units (22%)
+model fable   economy  week 21304118 / 30005800 (71%)
+model haiku   ok       week 559344 / ? (n/a)
+model opus    ok       week 28131516 / ? (n/a)
+model sonnet  ok       week 4407242 / ? (n/a)
+context: 412880 / 1000000 tokens (41%) -> ok  [3f2a9c1e-….jsonl]
+calibration 5h: 1% ≈ 459704 units (learned at 63%, 2026-05-04T12:31Z)
+calibration 7d: 1% ≈ 2496956 units (learned at 22%, 2026-05-04T12:31Z)
+source: statusline+transcripts
+actions:
+  - ECONOMY: max 2 parallel heavy agents; no refute panels; prefer haiku for search/build, sonnet for analysis; reviews only for risky changes.
+  - FABLE ECONOMY: use fable only as judge for critical/protocol decisions; other fable roles -> opus, effort max.

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="190" viewBox="0 0 1000 190" role="img" aria-labelledby="sl-title sl-desc">
+  <title id="sl-title">Claude Orchestrator status line</title>
+  <desc id="sl-desc">A terminal status line that reads: Opus 5.5 · ctx 41% · 5h 63% ↻14:50 · 7d 22%. Callouts explain each segment: model, context window used, 5-hour limit used with its reset time, weekly limit used.</desc>
+  <defs>
+    <linearGradient id="sl-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#161b2e"/>
+    </linearGradient>
+    <linearGradient id="sl-border" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity=".45"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
+    .seg  { font-size: 28px; text-anchor: middle; }
+    .sep  { font-size: 28px; text-anchor: middle; fill: #7d8590; }
+    .lbl  { font-size: 15px; text-anchor: middle; fill: #c9d1d9; }
+    .cap  { font-size: 14px; text-anchor: middle; fill: #8b949e; }
+    .lead { fill: none; stroke-width: 1.25; stroke-linecap: round; }
+    @media (prefers-reduced-motion: no-preference) {
+      .pulse { animation: sl-pulse 3.4s ease-in-out infinite; }
+      @keyframes sl-pulse { 0%, 100% { fill-opacity: .13; } 50% { fill-opacity: .27; } }
+    }
+  </style>
+
+  <!-- card -->
+  <rect x="0.75" y="0.75" width="998.5" height="188.5" rx="16" fill="url(#sl-bg)" stroke="url(#sl-border)" stroke-width="1.5"/>
+
+  <!-- terminal status row -->
+  <rect x="40" y="58" width="920" height="50" rx="11" fill="#0a0d14" stroke="#2a3142"/>
+
+  <!-- segment highlights -->
+  <rect x="101" y="66" width="157" height="34" rx="8" fill="#8b5cf6" fill-opacity=".14" stroke="#8b5cf6" stroke-opacity=".6"/>
+  <rect x="304" y="66" width="140" height="34" rx="8" fill="#22d3ee" fill-opacity=".12" stroke="#22d3ee" stroke-opacity=".6"/>
+  <rect class="pulse" x="489" y="66" width="241" height="34" rx="8" fill="#f59e0b" fill-opacity=".16" stroke="#f59e0b" stroke-opacity=".7"/>
+  <rect x="776" y="66" width="123" height="34" rx="8" fill="#22c55e" fill-opacity=".12" stroke="#22c55e" stroke-opacity=".6"/>
+
+  <!-- status line text: Opus 5.5 · ctx 41% · 5h 63% ↻14:50 · 7d 22% -->
+  <text class="mono seg" x="179.5" y="93" fill="#a78bfa">Opus 5.5</text>
+  <text class="mono sep" x="281" y="93">·</text>
+  <text class="mono seg" x="374" y="93" fill="#22d3ee">ctx 41%</text>
+  <text class="mono sep" x="466.5" y="93">·</text>
+  <text class="mono seg" x="609.5" y="93" fill="#fbbf24">5h 63% ↻14:50</text>
+  <text class="mono sep" x="753" y="93">·</text>
+  <text class="mono seg" x="837.5" y="93" fill="#4ade80">7d 22%</text>
+
+  <!-- leader lines + dots -->
+  <path class="lead" d="M179.5 66 V38" stroke="#8b5cf6"/>
+  <path class="lead" d="M374 100 V124" stroke="#22d3ee"/>
+  <path class="lead" d="M609.5 66 V38" stroke="#f59e0b"/>
+  <path class="lead" d="M837.5 100 V124" stroke="#22c55e"/>
+  <circle cx="179.5" cy="66" r="3" fill="#8b5cf6"/>
+  <circle cx="374" cy="100" r="3" fill="#22d3ee"/>
+  <circle cx="609.5" cy="66" r="3" fill="#f59e0b"/>
+  <circle cx="837.5" cy="100" r="3" fill="#22c55e"/>
+
+  <!-- callout labels -->
+  <text class="sans lbl" x="179.5" y="30">model</text>
+  <text class="sans lbl" x="374" y="143">context window used</text>
+  <text class="sans lbl" x="609.5" y="30">5-hour limit used · resets at 14:50</text>
+  <text class="sans lbl" x="837.5" y="143">weekly limit used</text>
+
+  <!-- caption -->
+  <text class="sans cap" x="500" y="175">Pro/Max plans: official numbers · API key: context only</text>
+</svg>

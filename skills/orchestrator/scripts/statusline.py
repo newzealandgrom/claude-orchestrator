@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Code status line for the team orchestrator.
+"""Claude Code status line for Claude Orchestrator.
 
 Claude Code pipes a JSON document to the status line command on every refresh. For Pro/Max
 subscribers it contains the official plan usage (``rate_limits.five_hour`` / ``seven_day``:
@@ -7,7 +7,7 @@ subscribers it contains the official plan usage (``rate_limits.five_hour`` / ``s
 
 This script
   1. prints one compact line:  Opus 5.5 · ctx 41% · 5h 63% ↻14:50 · 7d 22%
-  2. saves the official numbers to <config>/team-orchestrator/statusline.json, where
+  2. saves the official numbers to <config>/claude-orchestrator/statusline.json, where
      ``limits.py`` picks them up (exact data beats estimates from transcripts).
 
 Enable it in ~/.claude/settings.json (or a project's .claude/settings.json):
@@ -30,7 +30,7 @@ def config_dir() -> str:
 
 
 def snapshot_path() -> str:
-    return os.path.join(config_dir(), "team-orchestrator", "statusline.json")
+    return os.path.join(config_dir(), "claude-orchestrator", "statusline.json")
 
 
 def pct(v) -> str:

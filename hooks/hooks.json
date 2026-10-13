@@ -2,9 +2,23 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/sync_stable.py\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
         "matcher": "compact|resume|clear",
         "hooks": [
-          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/checkpoint.py\" --hook", "timeout": 30 }
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/checkpoint.py\" --hook",
+            "timeout": 30
+          }
         ]
       }
     ],
@@ -12,14 +26,27 @@
       {
         "matcher": "Agent",
         "hooks": [
-          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/limits.py\" --hook PostToolUse", "timeout": 30 }
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/limits.py\" --hook PostToolUse",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/costs.py\" --hook PostToolUse",
+            "timeout": 30
+          }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/limits.py\" --hook UserPromptSubmit --cache-sec 120", "timeout": 30 }
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/orchestrator/scripts/limits.py\" --hook UserPromptSubmit --cache-sec 120",
+            "timeout": 30
+          }
         ]
       }
     ]

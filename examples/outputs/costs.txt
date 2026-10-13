@@ -1,0 +1,17 @@
+Costs — session 3f2a9c1e · since 2026-05-04 09:52Z · 412 responses
+  total: 61.2M tokens · 8.47M units · ≈ 18.4% of the 5-hour limit · ≈ 3.4% of the week
+
+  role                         agents   model   tokens    units   ≈5h %  share
+  orchestrator (main)               1    opus    24.1M    3.52M    7.7%    42%
+  orch-dev-senior                   2    opus    19.8M    2.61M    5.7%    31%
+  orch-reviewer                     2    opus    9.40M    1.37M    3.0%    16%
+  orch-tech-writer                  1  sonnet    3.10M   402.5k    0.9%     5%
+  orch-security                     1   fable    1.20M   388.0k    0.8%     5%
+  orch-scout                        3   haiku    3.60M   121.0k    0.3%     1%
+  orch-build-verifier               2   haiku    0.20M    14.2k    0.0%     0%
+
+  top agents:
+    orch-dev-senior        a3de429a5d    1.52M units  opus   API + web client for password reset
+    orch-reviewer          a0bfb4ae2d    0.81M units  opus   Review backend changes
+
+  budget (2026-05-04-password-reset.md, all sessions since 2026-05-04 16:50): 25% of the 5-hour limit → spent 18.4% = 74% → OK

@@ -21,7 +21,7 @@ Usage:
                               (for Claude Code hooks; silent otherwise)
     limits.py --session-file PATH --context-window 1000000 --config FILE
 
-Config (optional, JSON): $ORCH_LIMITS_CONFIG or ~/.claude/team-orchestrator/limits.json
+Config (optional, JSON): $ORCH_LIMITS_CONFIG or ~/.claude/claude-orchestrator/limits.json
     {
       "session_cap_units": null,          # override the estimated 5-hour cap
       "weekly_cap_units": null,           # override the estimated 7-day cap
@@ -42,6 +42,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -76,6 +77,7 @@ CACHE_READ_FACTOR = 0.1
 LIMIT_RE = re.compile(r"(hit|reached|exceeded|approaching)[^.\n]{0,40}\blimit\b", re.I)
 WARN_RE = re.compile(r"used\s+(?P<pct>\d{1,3})%\s+of\s+your\s+(?P<what>[a-z0-9 .-]+?)\s+limit", re.I)
 SNAPSHOT_MAX_AGE_SEC = 600
+CALIB_MAX_AGE_DAYS = 14
 RESET_RE = re.compile(
     r"resets?\s+(?:at\s+)?(?:(?P<wday>mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?,?\s+)?"
     r"(?:(?P<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(?P<mday>\d{1,2}),?\s+(?:at\s+)?)?"
@@ -92,10 +94,24 @@ def config_dir() -> str:
     return os.environ.get("CLAUDE_CONFIG_DIR") or os.path.expanduser("~/.claude")
 
 
+DATA_DIR = "claude-orchestrator"            # <config>/claude-orchestrator: snapshot, calibration, hook state
+LEGACY_DATA_DIRS = ("team-orchestrator",)   # v1 name, still read as a fallback
+
+
+def data_file(name: str, read: bool = False) -> str:
+    path = os.path.join(config_dir(), DATA_DIR, name)
+    if read and not os.path.exists(path):
+        for legacy in LEGACY_DATA_DIRS:
+            old = os.path.join(config_dir(), legacy, name)
+            if os.path.exists(old):
+                return old
+    return path
+
+
 def load_config(path: Optional[str]) -> Dict[str, Any]:
     cfg = json.loads(json.dumps(DEFAULT_CONFIG))
     candidates = [path, os.environ.get("ORCH_LIMITS_CONFIG"),
-                  os.path.join(config_dir(), "team-orchestrator", "limits.json")]
+                  data_file("limits.json", read=True)]
     for cand in candidates:
         if cand and os.path.isfile(cand):
             try:
@@ -378,14 +394,33 @@ def analyse(scan_res: Scan, cfg: Dict[str, Any], now: dt.datetime, session_file:
             active.append({"kind": ev["kind"], "model_family": ev["model_family"],
                            "until": until.isoformat(), "text": ev["text"]})
 
+    # ---- self-calibration: fresh official numbers teach "units per 1 %"; a stale snapshot falls back to it
+    calib = calibrate(entries, off_five, off_week, now, cfg) if snap else load_calibration(now, cfg)
+    block_end_official = None
+    calibrated = False
+    win5 = official_window(off_five, span)
+    if win5:  # count units in the official window, not in the locally guessed block
+        cur_units, block_end_official = units_between(entries, win5[0], now), win5[1]
+    c5 = calib.get("session") or {}
+    if off_five.get("used_percentage") is None and c5.get("units_per_pct") and not cfg.get("session_cap_units"):
+        session_cap, cap_source, calibrated = c5["units_per_pct"] * 100.0, "calibrated", True
+        end = parse_ts(c5.get("resets_at"))
+        if end and end > now:  # still the same official 5-hour window
+            cur_units, block_end_official = units_between(entries, end - span, now), end
+    c7 = calib.get("weekly") or {}
+    if off_week.get("used_percentage") is None and c7.get("units_per_pct") and not cfg.get("weekly_cap_units"):
+        weekly_cap, calibrated = c7["units_per_pct"] * 100.0, True
+        end = parse_ts(c7.get("resets_at"))
+        if end:
+            while end <= now:  # the weekly reset moment repeats every 7 days
+                end += dt.timedelta(days=WEEK_DAYS)
+            week_units = units_between(entries, end - dt.timedelta(days=WEEK_DAYS), now)
+
     th = cfg["thresholds"]
     session_pct = (cur_units / session_cap) if session_cap else None
     weekly_pct = (week_units / weekly_cap) if weekly_cap else None
-    block_end_official = None
     if off_five.get("used_percentage") is not None:
         session_pct, cap_source = float(off_five["used_percentage"]) / 100.0, "statusline"
-        if off_five.get("resets_at"):
-            block_end_official = dt.datetime.fromtimestamp(float(off_five["resets_at"]), UTC)
     if off_week.get("used_percentage") is not None:
         weekly_pct = float(off_week["used_percentage"]) / 100.0
     pcts = [p for p in (session_pct, weekly_pct) if p is not None]
@@ -438,7 +473,7 @@ def analyse(scan_res: Scan, cfg: Dict[str, Any], now: dt.datetime, session_file:
     return {
         "now": now.isoformat(),
         "mode": mode,
-        "data_source": "statusline+transcripts" if snap else "transcripts",
+        "data_source": "statusline+transcripts" if snap else ("calibrated+transcripts" if calibrated else "transcripts"),
         "session": {
             "block_start": current["start"].isoformat() if current else None,
             "block_end": (block_end_official or (current["end"] if current else None)).isoformat()
@@ -453,21 +488,84 @@ def analyse(scan_res: Scan, cfg: Dict[str, Any], now: dt.datetime, session_file:
         "context": ctx,
         "actions": actions,
         "observed_limit_events": len(events),
+        "calibration": {k: calib[k] for k in ("session", "weekly") if k in calib},
     }
+
+
+def official_window(entry: Dict[str, Any], span: dt.timedelta) -> Optional[Tuple[dt.datetime, dt.datetime]]:
+    """(start, end) of an official limit window, from its ``resets_at`` epoch."""
+    try:
+        end = dt.datetime.fromtimestamp(float(entry["resets_at"]), UTC)
+    except (KeyError, TypeError, ValueError, OSError, OverflowError):
+        return None
+    return end - span, end
+
+
+def load_calibration(now: dt.datetime, cfg: Dict[str, Any], max_age_days: Optional[int] = CALIB_MAX_AGE_DAYS) -> Dict[str, Any]:
+    try:
+        with open(data_file("calibration.json"), encoding="utf-8") as fh:
+            calib = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(calib, dict) or calib.get("weights") != cfg["model_weights"]:
+        return {}  # units are only comparable under the same model weights
+    for key in ("session", "weekly"):
+        at = parse_ts((calib.get(key) or {}).get("at"))
+        if key in calib and (at is None or (max_age_days is not None and (now - at).days > max_age_days)):
+            calib.pop(key)
+    return calib
+
+
+def calibrate(entries, off_five: Dict[str, Any], off_week: Dict[str, Any], now: dt.datetime,
+              cfg: Dict[str, Any]) -> Dict[str, Any]:
+    """While official numbers are fresh, learn how many usage units make 1 % of each limit.
+
+    Used when the snapshot goes stale (status line not refreshed, hooks between renders, other
+    terminals): estimates then follow the official scale instead of the history-based guess. It is an
+    approximation between refreshes — usage on other devices or claude.ai is invisible locally — and
+    fresh official numbers always win.
+    """
+    calib = load_calibration(now, cfg, max_age_days=None)
+    calib["weights"] = cfg["model_weights"]
+    for key, entry, span in (("session", off_five, dt.timedelta(hours=SESSION_HOURS)),
+                             ("weekly", off_week, dt.timedelta(days=WEEK_DAYS))):
+        win = official_window(entry, span)
+        if entry.get("used_percentage") is None or win is None:
+            continue
+        pct = float(entry["used_percentage"])
+        if pct < 3 or (pct < 10 and (calib.get(key) or {}).get("units_per_pct")):
+            continue  # integer percentages are too coarse at a low fill
+        used = units_between(entries, win[0], now)
+        if used > 0:
+            calib[key] = {"units_per_pct": round(used / pct, 1), "pct": pct, "at": now.isoformat(),
+                          "resets_at": win[1].isoformat()}
+    try:
+        path = data_file("calibration.json")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=".calibration.")
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(calib, fh)
+        os.replace(tmp, path)
+    except OSError:
+        pass
+    return calib
 
 
 def load_snapshot(now: dt.datetime) -> Optional[Dict[str, Any]]:
     """Official numbers saved by statusline.py (Pro/Max: rate_limits; everyone: context_window)."""
-    path = os.path.join(config_dir(), "team-orchestrator", "statusline.json")
-    try:
-        with open(path, encoding="utf-8") as fh:
-            snap = json.load(fh)
-    except (OSError, ValueError):
+    best, best_ts = None, None
+    for d in (DATA_DIR,) + LEGACY_DATA_DIRS:  # an old v1 status line may still write to the legacy dir
+        try:
+            with open(os.path.join(config_dir(), d, "statusline.json"), encoding="utf-8") as fh:
+                snap = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        saved = parse_ts(snap.get("saved_at"))
+        if saved and (best_ts is None or saved > best_ts):
+            best, best_ts = snap, saved
+    if best_ts is None or (now - best_ts).total_seconds() > SNAPSHOT_MAX_AGE_SEC:
         return None
-    saved = parse_ts(snap.get("saved_at"))
-    if saved is None or (now - saved).total_seconds() > SNAPSHOT_MAX_AGE_SEC:
-        return None
-    return snap
+    return best
 
 
 def project_dir_for(cwd: str) -> str:
@@ -559,13 +657,18 @@ def human(rep: Dict[str, Any]) -> str:
                  f"({fmt_pct(c['pct'])}) -> {c['status']}  [{c['session_file'] or 'no session file'}]")
     for a in rep["active_limits"]:
         lines.append(f"ACTIVE LIMIT {a['kind']} until {a['until']}: {a['text']}")
+    for key, label in (("session", "5h"), ("weekly", "7d")):
+        cal = (rep.get("calibration") or {}).get(key)
+        if cal:
+            lines.append(f"calibration {label}: 1% ≈ {cal['units_per_pct']:.0f} units (learned at {cal['pct']:.0f}%, {cal['at'][:16]}Z)")
+    lines.append(f"source: {rep.get('data_source', '?')}")
     lines.append("actions:")
     lines += [f"  - {x}" for x in rep["actions"]]
     return "\n".join(lines)
 
 
 def state_path() -> str:
-    return os.path.join(config_dir(), "team-orchestrator", "last-state.json")
+    return data_file("last-state.json")
 
 
 def hook_output(rep: Dict[str, Any], always: bool = False) -> Optional[str]:
@@ -589,7 +692,7 @@ def hook_output(rep: Dict[str, Any], always: bool = False) -> Optional[str]:
     if not always and (key == prev or (not degraded and prev is None)):
         return None
     s = rep["session"]
-    head = (f"[team-orchestrator limits] mode={rep['mode']} session={fmt_pct(s['pct'])} "
+    head = (f"[orchestrator limits] mode={rep['mode']} session={fmt_pct(s['pct'])} "
             f"week={fmt_pct(rep['weekly']['pct'])} context={fmt_pct(rep['context']['pct'])} "
             f"models=" + ",".join(f"{k}:{v['status']}" for k, v in rep["models"].items()))
     return head + " :: " + " | ".join(rep["actions"])
@@ -597,7 +700,7 @@ def hook_output(rep: Dict[str, Any], always: bool = False) -> Optional[str]:
 
 def cached_report(cfg, now, session_file, context_window, max_age: int) -> Dict[str, Any]:
     """Hooks fire often: reuse a fresh report instead of re-scanning transcripts."""
-    path = os.path.join(config_dir(), "team-orchestrator", "last-report.json")
+    path = data_file("last-report.json")
     try:
         if max_age > 0 and (now.timestamp() - os.path.getmtime(path)) < max_age:
             with open(path, encoding="utf-8") as fh:
@@ -641,7 +744,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             rep = cached_report(cfg, now, session_file, args.context_window, args.cache_sec)
             msg = hook_output(rep, always=args.always)
         except Exception as exc:  # a hook must never break the session
-            print(f"team-orchestrator limits hook error: {exc}", file=sys.stderr)
+            print(f"orchestrator limits hook error: {exc}", file=sys.stderr)
             return 0
         if msg:
             if args.hook == "plain":

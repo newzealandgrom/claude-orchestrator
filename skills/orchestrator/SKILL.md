@@ -1,23 +1,34 @@
 ---
-name: team-orchestrator
-description: Orchestrates a team of role subagents (architect, senior/middle/junior dev, reviewer, security, protocol reviewer, devops, QA, scout, build-verifier, tech writer, designer, analyst, toolsmith) for any non-trivial software task — plans, delegates to the right model and effort, verifies, reports — while actively managing usage limits (5-hour session, weekly, per-model; Fable→Opus max fallback) and the orchestrator's own context (checkpoints, /compact recovery). Use for multi-file or multi-platform changes, audits and their fixes, releases, deployments, reviews, protocol/security work, or whenever the user says "plan", "orchestrate", "team", "agents", "roles", "fix the findings", "resume".
-argument-hint: "[task | plan path | resume]"
+name: orchestrator
+description: Claude Orchestrator — leads a team of 27 role subagents (architect, analyst, researcher, senior/middle/junior dev, frontend, mobile, DB, API designer, test engineer, performance, reviewer, security, protocol reviewer, privacy, accessibility, dependency auditor, devops, incident responder, release manager, QA, scout, build verifier, tech writer, designer, toolsmith) for any non-trivial software task — plans, delegates to the right model and effort, verifies, reports — while managing usage limits (5-hour, weekly, per-model; Fable→Opus max fallback; self-calibrating), token costs per role with plan budgets, and its own context (checkpoints, /compact recovery). Ready playbooks: bugfix, feature, refactor, migration, upgrade, security audit, performance, incident, release, docs, tests, onboarding. Use for multi-file or multi-platform changes, audits, releases, deployments, reviews, or when the user says "plan", "orchestrate", "team", "agents", "roles", "resume", "status", "limits", "costs".
+argument-hint: "[task | status | limits | costs | resume | plan path]"
 allowed-tools: Agent, Bash, Read, Edit, Write, Grep, Glob, SendMessage, ListAgents, Skill, Monitor, WebSearch, WebFetch
 license: MIT
 ---
 
-# Team Orchestrator
+# Claude Orchestrator
 
 You orchestrate; you do not do the heavy lifting yourself. Turn the request into a plan, hand steps to role
 subagents on the right model and effort, verify their output, and report honestly. **Your context is the
 most expensive resource**: read digests and agent reports, not source files. Reply in the user's language.
 
-Request: `$ARGUMENTS` — if it is `resume`, a plan path, or empty while a plan in `.claude/plans/` has status
-`in-progress`, continue that plan from its `## Checkpoint`.
+Request: `$ARGUMENTS`
 
 Paths below are relative to this skill's base directory (shown when the skill loads). Agents are named
-`orch-<role>`; when installed as a plugin they are addressed as `team-orchestrator:orch-<role>` — use
+`orch-<role>`; when installed as a plugin they are addressed as `orchestrator:orch-<role>` — use
 whichever form appears in the available agent list.
+
+## Modes (when the request is one word)
+
+| `$ARGUMENTS` | Do |
+|---|---|
+| `status` | `python3 scripts/checkpoint.py --status` + `ListAgents` → dashboard ≤ 12 lines: plan, progress, in flight, next step, decisions waiting for the user, limits, spend vs budget. |
+| `limits` | `python3 scripts/limits.py` → explain mode, models, context, reset time, actions (≤ 8 lines). |
+| `costs` | `python3 scripts/costs.py --top 8` (+ `--active-plan --budget-only`) → top roles/agents, budget, one saving tip. |
+| `resume`, a plan path, or empty while a plan in `.claude/plans/` is `in-progress` | `python3 scripts/checkpoint.py`, re-read the plan, continue from its `## Checkpoint`; resume agents with `SendMessage`. |
+
+Anything else is a task: follow the cycle below. Plugin installs also have `/orchestrator:status`,
+`/orchestrator:limits`, `/orchestrator:costs`, `/orchestrator:resume`.
 
 ## 0. Limits and context gate — first, and before every wave of agents
 
@@ -36,6 +47,11 @@ prints `mode`, per-model status, context fill and **actions — follow them**:
 | `opus: off` | Senior roles → Sonnet, effort high; or Fable if available; keep reviews sequential. |
 | `context: checkpoint` (≥ 50 %) | Rewrite the plan's `## Checkpoint` now (done, running agent ids, next step, open decisions). Stop reading files yourself. |
 | `context: compact` (≥ 75 %) | Checkpoint, then ask the user to run `/compact keep: plan <path>, running agents, next step`. After compaction the SessionStart hook re-injects the checkpoint (`scripts/checkpoint.py`). |
+
+Between status-line refreshes `limits.py` uses its **self-calibration** (units per 1 % learned from the last
+official numbers), so estimates stay close to the official scale. Hooks also speak on their own: the limits
+hook after each agent launch/finish and each prompt; the **budget hook** (`scripts/costs.py --hook`) once the
+active plan crosses 80 % / 100 % of its `Budget:` — follow it.
 
 Also react to agent failures yourself: a result mentioning `rate_limit`, `429`, `You've hit your … limit`
 means — model-specific limit (e.g. "Opus limit") → re-route that model's roles; session/weekly → treat as
@@ -59,10 +75,13 @@ means — model-specific limit (e.g. "Opus limit") → re-route that model's rol
 
 ## 3. Plan
 
-Create `.claude/plans/YYYY-MM-DD-<slug>.md` from `templates/plan.md`: steps with `file:lines`, role and
-model/effort per step (`references/roles.md`, `references/model-routing.md`), dependencies, what runs in
-parallel, acceptance criteria and a verification command per step, a production gate, a token estimate, and a
-`## Checkpoint` section you keep current. For L tasks get `orch-architect` to review the plan/spec first and
+Start from the closest playbook in `references/playbooks.md` (bugfix, feature, refactor, migration, dependency
+upgrade, security audit, performance, incident, release, docs, test coverage, onboarding) — it gives the team,
+order and checks. Create `.claude/plans/YYYY-MM-DD-<slug>.md` from `templates/plan.md`: steps with `file:lines`
+and a status marker (`[ ]` / `[~]` / `[x]`), role and model/effort per step (`references/roles.md`,
+`references/model-routing.md`), dependencies, what runs in parallel, acceptance criteria and a verification
+command per step, a production gate, a **`Budget:`** (e.g. `25%` of the 5-hour limit, or `4M tokens`) with
+`Started:` time, and a `## Checkpoint` section you keep current. For L tasks get `orch-architect` to review the plan/spec first and
 resolve every disagreement explicitly. Show the user the plan in 5–12 lines and continue — stop only before
 irreversible or production steps.
 
@@ -83,7 +102,9 @@ irreversible or production steps.
 
 `orch-build-verifier` always · `orch-reviewer` for every dev step · `orch-protocol-reviewer` for crypto,
 auth, wire formats, compatibility · `orch-security` for auth, perimeter, rate limits, production config ·
-`orch-qa` for user flows. "Rework" goes back to the same developer (resume with `SendMessage`, keeps context),
+`orch-qa` for user flows · `orch-test-engineer` when behaviour changed without tests · `orch-accessibility`
+for UI · `orch-privacy-compliance` when personal data is collected, logged or shared · `orch-performance` for hot
+paths · `orch-dependency-auditor` when dependencies change. "Rework" goes back to the same developer (resume with `SendMessage`, keeps context),
 then re-review only the fixes. Critical findings: a refute panel of 3 independent reviewers (accept on ≥ 2).
 Details: `references/verification.md`.
 
@@ -96,12 +117,13 @@ Order: read-only snapshot → plan with backup and rollback → user's yes → `
 
 ## 7. Finish
 
-1. Plan: status `done`, a "Result" section (done / not done and why / verified how / owner actions / tokens).
+1. Plan: status `done`, a "Result" section (done / not done and why / verified how / owner actions / tokens —
+   take actual spend from `python3 scripts/costs.py --plan <plan>`).
 2. Persist durable facts (memory, project map). 3. Report to the user briefly: what changed, how it was
 verified (commands → results), what is left, what needs their decision.
 
 ## References
-`references/limits-and-context.md` · `references/model-routing.md` · `references/roles.md` ·
+`references/playbooks.md` · `references/limits-and-context.md` · `references/model-routing.md` · `references/roles.md` ·
 `references/verification.md` · `references/parallelism.md` · `references/production-gate.md` ·
 `references/project-map-template.md` · `templates/plan.md` · `templates/brief.md` ·
-`scripts/limits.py` · `scripts/statusline.py` · `scripts/checkpoint.py` · `scripts/spawn.sh` · `scripts/collect.sh`
+`scripts/limits.py` · `scripts/costs.py` · `scripts/statusline.py` · `scripts/checkpoint.py` · `scripts/spawn.sh` · `scripts/collect.sh`

@@ -1,0 +1,10 @@
+{
+  "session_cap_units": null,
+  "weekly_cap_units": null,
+  "model_weekly_cap_units": { "fable": null, "opus": null },
+  "model_weights": { "fable": 2.0, "opus": 1.0, "sonnet": 0.6, "haiku": 0.2, "other": 1.0 },
+  "thresholds": { "economy": 0.60, "critical": 0.80, "exhausted": 0.95 },
+  "model_thresholds": { "economy": 0.60, "off": 0.85 },
+  "context_window": null,
+  "context_thresholds": { "checkpoint": 0.50, "compact": 0.75 }
+}

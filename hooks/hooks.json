@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact|resume|clear",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/checkpoint.py\" --hook", "timeout": 30 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/limits.py\" --hook PostToolUse", "timeout": 30 }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/team-orchestrator/scripts/limits.py\" --hook UserPromptSubmit --cache-sec 120", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}

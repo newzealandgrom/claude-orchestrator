@@ -1,0 +1,11 @@
+{
+  "name": "team-orchestrator",
+  "displayName": "Team Orchestrator",
+  "description": "Multi-agent orchestrator for Claude Code: plans work, routes 15 role subagents to the right model and effort, verifies results, and actively manages session/weekly/per-model limits (Fable→Opus fallback) and context (checkpoints, /compact recovery).",
+  "version": "1.0.0",
+  "author": { "name": "newzealandgrom", "url": "https://github.com/newzealandgrom" },
+  "homepage": "https://github.com/newzealandgrom/claude-orchestrator",
+  "repository": "https://github.com/newzealandgrom/claude-orchestrator",
+  "license": "MIT",
+  "keywords": ["orchestrator", "multi-agent", "subagents", "workflow", "rate-limits", "context-management", "planning", "code-review"]
+}
